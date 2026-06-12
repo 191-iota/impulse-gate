@@ -3,9 +3,8 @@
 **[⬇ Download the APK (v1.0)](https://github.com/lambdaf-org/impulse-gate/releases/latest)** (~620 KB, Android 8.0+)
 
 Your phone is full of apps engineered by very smart people whose paycheck depends on
-you opening them. They won that fight years ago: at some point "checking" stopped
-being a decision and became a reflex. Willpower does nothing against a feed tuned by
-ten thousand A/B tests. So stop fighting fair.
+you opening them. Willpower does nothing against a feed tuned by ten thousand A/B
+tests. So stop fighting fair.
 
 A tiny Android app (~600 KB, zero dependencies) that puts a wall between you and your
 impulses. You pick which apps to gate; from then on, opening one of them shows a
@@ -15,11 +14,6 @@ hidden until you type:
 ```
 i want this
 ```
-
-Eleven keystrokes. Long enough to wake up the part of your brain that actually decides
-things. If you still mean it, fine: you typed it, go in with your eyes open. Most of
-the time you won't bother, because you never wanted to open it in the first place. The
-reflex did.
 
 Leave the app and the gate re-arms, so the next open asks you to type again. Transient
 windows like the keyboard or a permission dialog do **not** re-lock you mid-session.
