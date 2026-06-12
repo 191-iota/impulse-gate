@@ -147,7 +147,7 @@ class MainActivity : Activity() {
     override fun onResume() {
         super.onResume()
         val on = isServiceEnabled()
-        statusText.text = if (on) "Gate is active" else "Gate is OFF — enable the\naccessibility service"
+        statusText.text = if (on) "Gate is active" else "Gate is OFF. Enable the\naccessibility service"
         statusText.setTextColor(if (on) accent else Color.WHITE)
         statusButton.text = if (on) "SETTINGS" else "ENABLE"
     }

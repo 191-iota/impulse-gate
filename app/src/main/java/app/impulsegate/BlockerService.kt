@@ -94,7 +94,7 @@ class BlockerService : AccessibilityService() {
             hideOverlay()
         }
         // Otherwise: a transient system window (permission dialog, share sheet, volume
-        // panel...) appeared over the gated app. Not a switch — keep the unlock.
+        // panel...) appeared over the gated app. Not a switch, so keep the unlock.
     }
 
     // True only for windows that mean "the user left": the home screen / recents, or
@@ -340,7 +340,7 @@ class BlockerService : AccessibilityService() {
         try {
             windowManager.addView(root, lp)
         } catch (e: Exception) {
-            return // window token gone (service shutting down) — fail closed next event
+            return // window token gone (service shutting down); fail closed on the next event
         }
         overlay = root
         gatedPkg = pkg
