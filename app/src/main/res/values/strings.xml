@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Impulse Gate</string>
+    <string name="service_desc">Shows a full-screen gate when you open an app you chose to gate. You must type the phrase before the app becomes visible. Impulse Gate does not read screen content.</string>
+</resources>
