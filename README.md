@@ -1,6 +1,10 @@
 # Impulse Gate
 
-**[⬇ Download the APK (v1.0)](https://github.com/lambdaf-org/impulse-gate/releases/latest)** (~620 KB, Android 8.0+)
+> An Android accessibility service that drops a full-screen wall in front of apps chosen for gating and keeps them hidden until the phrase `i want this` is typed by hand.
+
+![Kotlin](https://img.shields.io/badge/Kotlin-2.0-7F52FF?logo=kotlin&logoColor=white)
+
+**[Download the APK (v1.0)](https://github.com/lambdaf-org/impulse-gate/releases/latest)** (~620 KB, Android 8.0+)
 
 Your phone is full of apps engineered by very smart people whose paycheck depends on
 you opening them. Willpower does nothing against a feed tuned by ten thousand A/B
@@ -15,8 +19,8 @@ hidden until you type:
 i want this
 ```
 
-Leave the app and the gate re-arms, so the next open asks you to type again. Transient
-windows like the keyboard or a permission dialog do **not** re-lock you mid-session.
+Leaving the app re-arms the gate, so the next open asks for the phrase again. Transient
+windows like the keyboard or a permission dialog do not re-lock the session.
 
 <p align="center">
   <img src="screenshots/gate.png" width="280" alt="The gate over Chrome" />
@@ -26,57 +30,70 @@ windows like the keyboard or a permission dialog do **not** re-lock you mid-sess
 Verified end-to-end on an Android 15 emulator, from the opaque gate through phrase
 unlock and re-lock on leave.
 
-## How it works
-
-One `AccessibilityService` listens for window changes. When a gated app reaches the
-foreground it attaches an opaque, full-screen `TYPE_ACCESSIBILITY_OVERLAY` window with
-no animation. The Back button is swallowed; Home is the escape hatch. No "draw over
-other apps" permission is needed, since accessibility services may add these overlays
-directly. The service reads nothing from your screen
-(`canRetrieveWindowContent="false"`).
-
-## Build
-
-Requires JDK 17 and the Android SDK (platform 35).
+## Quickstart
 
 ```bash
+git clone https://github.com/lambdaf-org/impulse-gate
+cd impulse-gate
 export JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
 export ANDROID_HOME=$HOME/Library/Android/sdk
 ./gradlew assembleRelease
 ```
 
-APK lands at `app/build/outputs/apk/release/app-release.apk` (debug-signed, sideloadable).
+Building requires JDK 17 and the Android SDK (platform 35). The APK lands at
+`app/build/outputs/apk/release/app-release.apk`, debug-signed so it sideloads directly.
 
-## Install & set up
+Install it with adb:
 
-1. Enable USB debugging on the phone, then:
-   ```bash
-   $ANDROID_HOME/platform-tools/adb install app/build/outputs/apk/release/app-release.apk
-   ```
-   (Or copy the APK over and open it on the phone.)
-2. Open **Impulse Gate**, tick the apps you want gated.
-3. Tap **ENABLE** → Accessibility settings → Impulse Gate → turn it on.
+```bash
+$ANDROID_HOME/platform-tools/adb install app/build/outputs/apk/release/app-release.apk
+```
 
-> **Android 13+ note:** if you installed the APK from a file manager or browser
-> (not adb), Android blocks the accessibility toggle for sideloaded apps. Fix: go to
-> *Settings → Apps → Impulse Gate → ⋮ (top right) → Allow restricted settings*, then
-> enable the service. Installing via `adb install` avoids this entirely.
+Then open the app, tick the apps to gate, tap ENABLE, and turn on the service under
+Accessibility settings.
 
-## Notes & known limits
+> **Android 13+ note:** if the APK was installed from a file manager or browser rather
+> than adb, Android blocks the accessibility toggle for sideloaded apps. Go to
+> *Settings, Apps, Impulse Gate, top-right menu, Allow restricted settings*, then enable
+> the service. Installing via `adb install` avoids this.
 
-- The overlay appears the moment the system reports the window change. That is
-  practically instant, though a sub-100 ms flash of the app is inherent to the
-  accessibility approach on some devices.
-- Typing the phrase unlocks that app until you leave it. Each gated app is unlocked
-  separately.
-- Pasting the phrase doesn't count. The field blocks autofill and the paste menu, and
-  a clipboard-sized text jump gets wiped. You have to type it by hand.
-- The recents screen shows the gated app's real thumbnail (Android snapshots the app's
-  own surfaces; an external overlay can't be part of it). Inherent to this approach.
-- If Android force-kills the service (aggressive OEM battery management) while a gated
-  app is open, the gate drops until the service auto-rebinds. On stock Android the
-  system re-fires the window event on rebind and the gate self-restores in about a
-  second. A hard guarantee would require the "read screen content" capability, which
-  this app deliberately avoids.
-- This is self-discipline software. You can always uninstall it or disable the
-  service; the gate only needs to make opening an app a conscious act.
+## Features
+
+- **Phrase gate**: a gated app opens behind an opaque full-screen overlay, hidden until the exact phrase `i want this` is typed (whitespace and case are normalized).
+- **Typed entry, paste blocked**: the input field blocks autofill and the long-press menu, and a clipboard-sized text jump (8 or more inserted characters) gets wiped, so the phrase has to be typed by hand.
+- **Per-app, per-visit unlock**: typing the phrase unlocks that one app until the user leaves it. Each gated app is tracked separately, and leaving re-arms the gate.
+- **No screen reading**: the service declares `canRetrieveWindowContent="false"` and reads nothing from the screen. It only listens for window-state changes.
+- **No overlay permission**: it draws a `TYPE_ACCESSIBILITY_OVERLAY` window, which an accessibility service may add without the "draw over other apps" grant.
+- **Zero dependencies**: the whole app is two Kotlin files building Views in code, with no third-party libraries.
+
+## How it works
+
+One `AccessibilityService` listens for `TYPE_WINDOW_STATE_CHANGED` events. When a gated
+package reaches the foreground, it attaches an opaque, full-screen overlay window with no
+animation, so nothing of the app shows through. The Back button is swallowed inside the
+overlay, and Home stays as the way out. A transient system window (permission dialog, share
+sheet, volume panel) over a gated app is not treated as leaving, so the unlock survives
+it. Going to the home screen, the recents view, or another launchable app re-arms the gate.
+
+The overlay is rebuilt on rotation and on fold or unfold, and the service swallows its own
+exceptions so a single failure cannot get it disabled by the system. If an aggressive OEM
+battery manager force-kills the service while a gated app is open, the gate drops until
+the system re-binds the service and re-fires the window event, which on stock Android
+self-restores in about a second.
+
+The chosen apps are stored in `SharedPreferences`. There are no environment variables or
+config files to set.
+
+## Notes and known limits
+
+- The overlay appears the moment the system reports the window change, which is effectively instant, though a sub-100 ms flash of the app is inherent to the accessibility approach on some devices.
+- The recents screen shows the gated app's real thumbnail, because Android snapshots the app's own surfaces and an external overlay cannot be part of that snapshot.
+- This is self-discipline software. The service can always be disabled or the app uninstalled. The gate only needs to make opening an app a conscious act.
+
+## Contributing
+
+See [lambdaf-org/contributing](https://github.com/lambdaf-org/contributing).
+
+## License
+
+MIT, see the [LICENSE](LICENSE) file.
