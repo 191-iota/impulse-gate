@@ -1,5 +1,7 @@
 # Impulse Gate
 
+**[⬇ Download the APK (v1.0)](https://github.com/191-iota/impulse-gate/releases/latest)** — ~620 KB, Android 8.0+.
+
 A tiny Android app (~600 KB, zero dependencies) that puts a wall between you and your
 impulses. You pick which apps to gate; from then on, opening one of them shows a
 fully opaque full-screen overlay **before you can see anything**, and the app stays
