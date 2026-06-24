@@ -88,20 +88,21 @@ class BlockerService : AccessibilityService() {
             if (pkg == gatedPkg && overlay != null) return // gate already up for this app
             unlockedPkg = null
             showOverlay(pkg)
-        } else if (isAppSwitch(pkg)) {
-            // The user really went somewhere else (another app, or home): re-arm the gate.
+        } else if (pkg in homePkgs()) {
+            // The user went to the launcher / home screen (also recents on modern
+            // Android): the app has been put away. Re-arm so the next open is gated.
             unlockedPkg = null
             hideOverlay()
         }
-        // Otherwise: a transient system window (permission dialog, share sheet, volume
-        // panel...) appeared over the gated app. Not a switch, so keep the unlock.
+        // Otherwise the user only stepped out of the unlocked app for a moment, into
+        // another app or a system surface (the camera, a share sheet, a photo picker,
+        // a permission dialog...). That is part of using the app, not leaving it, so
+        // keep the unlock: coming straight back must not raise the gate again.
     }
 
-    // True only for windows that mean "the user left": the home screen / recents, or
-    // another openable app. System dialogs and panels are not launchable and stay false.
-    private fun isAppSwitch(pkg: String): Boolean =
-        pkg in homePkgs() || packageManager.getLaunchIntentForPackage(pkg) != null
-
+    // The launcher / home-screen packages. Returning to one of these is the signal that
+    // the user deliberately left the app (as opposed to briefly stepping into the camera,
+    // a picker, or a dialog), so this is what re-arms the gate.
     private fun homePkgs(): Set<String> {
         val now = SystemClock.elapsedRealtime()
         if (now - homeCachedAt > IME_CACHE_MS) {

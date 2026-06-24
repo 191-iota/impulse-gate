@@ -19,8 +19,9 @@ hidden until you type:
 i want this
 ```
 
-Leaving the app re-arms the gate, so the next open asks for the phrase again. Transient
-windows like the keyboard or a permission dialog do not re-lock the session.
+Putting the app away, by going to the home screen or recents, re-arms the gate, so the
+next open asks for the phrase again. Stepping out for a moment into the keyboard, a
+permission dialog, the camera, or a picker does not re-lock the session.
 
 <p align="center">
   <img src="screenshots/gate.png" width="280" alt="The gate over Chrome" />
@@ -61,7 +62,7 @@ Accessibility settings.
 
 - **Phrase gate**: a gated app opens behind an opaque full-screen overlay, hidden until the exact phrase `i want this` is typed (whitespace and case are normalized).
 - **Typed entry, paste blocked**: the input field blocks autofill and the long-press menu, and a clipboard-sized text jump (8 or more inserted characters) gets wiped, so the phrase has to be typed by hand.
-- **Per-app, per-visit unlock**: typing the phrase unlocks that one app until the user leaves it. Each gated app is tracked separately, and leaving re-arms the gate.
+- **Per-app, per-visit unlock**: typing the phrase unlocks that one app until you put it away. Each gated app is tracked separately, and going to the home screen or recents re-arms the gate; briefly stepping into the camera, a picker, or another app does not.
 - **No screen reading**: the service declares `canRetrieveWindowContent="false"` and reads nothing from the screen. It only listens for window-state changes.
 - **No overlay permission**: it draws a `TYPE_ACCESSIBILITY_OVERLAY` window, which an accessibility service may add without the "draw over other apps" grant.
 - **Zero dependencies**: the whole app is two Kotlin files building Views in code, with no third-party libraries.
@@ -71,9 +72,10 @@ Accessibility settings.
 One `AccessibilityService` listens for `TYPE_WINDOW_STATE_CHANGED` events. When a gated
 package reaches the foreground, it attaches an opaque, full-screen overlay window with no
 animation, so nothing of the app shows through. The Back button is swallowed inside the
-overlay, and Home stays as the way out. A transient system window (permission dialog, share
-sheet, volume panel) over a gated app is not treated as leaving, so the unlock survives
-it. Going to the home screen, the recents view, or another launchable app re-arms the gate.
+overlay, and Home stays as the way out. Stepping out of a gated app for a moment, whether
+into a permission dialog, a share sheet, the volume panel, the camera, a photo picker, or
+another app, is not treated as leaving, so the unlock survives it. Only going to the home
+screen or the recents view re-arms the gate, so the next deliberate open asks for the phrase.
 
 The overlay is rebuilt on rotation and on fold or unfold, and the service swallows its own
 exceptions so a single failure cannot get it disabled by the system. If an aggressive OEM
