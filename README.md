@@ -24,7 +24,7 @@ next open asks for the phrase again. Stepping out for a moment into the keyboard
 permission dialog, the camera, or a picker does not re-lock the session.
 
 <p align="center">
-  <img src="screenshots/gate.png" width="280" alt="The gate over Chrome" />
+  <img src="screenshots/demo.gif" width="280" alt="Opening a gated app and typing the phrase to unlock it" />
   <img src="screenshots/picker.png" width="280" alt="App picker" />
 </p>
 
