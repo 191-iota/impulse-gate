@@ -4,7 +4,7 @@
 
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.0-7F52FF?logo=kotlin&logoColor=white)
 
-**[Download the APK (v1.0)](https://github.com/lambdaf-org/impulse-gate/releases/latest)** (~620 KB, Android 8.0+)
+**[Download the APK (v1.1)](https://github.com/lambdaf-org/impulse-gate/releases/latest)** (~620 KB, Android 8.0+)
 
 Your phone is full of apps engineered by very smart people whose paycheck depends on
 you opening them. Willpower does nothing against a feed tuned by ten thousand A/B
