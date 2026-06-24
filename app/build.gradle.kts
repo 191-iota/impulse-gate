@@ -13,8 +13,8 @@ android {
         // 34, not 35: Android 15 forces edge-to-edge on targetSdk 35, which would draw
         // the settings screen under the status bar. Nothing here needs 35 behavior.
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
     }
 
     buildTypes {
